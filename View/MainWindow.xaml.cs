@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace MatchGame
 {
@@ -15,13 +16,33 @@ namespace MatchGame
         TextBlock? lastTextBlockClicked;
         bool isHidden = false;
 
+        DispatcherTimer timer = new DispatcherTimer();
+        int numMatches;
+        int tenthOfSecondElapsed;
+
         public MainWindow()
         {
             InitializeComponent();
 
             SetupGame();
+
+            timer.Interval = TimeSpan.FromSeconds(0.1);
+            timer.Tick += TimerTick;
         }
 
+        private void TimerTick(object? sender, EventArgs e)
+        {
+            tenthOfSecondElapsed++;
+            timerTextBlock.Text = (tenthOfSecondElapsed / 10F).ToString("0.0s");
+        
+            if (numMatches == 8)
+            {
+                timer.Stop();
+                timerTextBlock.Text = timerTextBlock.Text + " - Play again";
+            }
+        }
+
+        
         void SetupGame()
         {
             Random random = new Random();
@@ -40,10 +61,18 @@ namespace MatchGame
 
             foreach (TextBlock textBlock in mainGrid.Children.OfType<TextBlock>())
             {
+                if (textBlock.Name == "timerTextBlock")
+                    break;
+
                 int index = random.Next(emojiList.Count);
                 textBlock.Text = emojiList[index];
                 emojiList.RemoveAt(index);
             }
+
+            timer.Start();
+            tenthOfSecondElapsed = 0;
+            numMatches = 0;
+
         }
 
         private void ToggleVisibility_OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -60,6 +89,7 @@ namespace MatchGame
             {
                 textBlock.Visibility = Visibility.Hidden;
                 lastTextBlockClicked = textBlock;
+                numMatches++;
                 isHidden = false;
             }
             else
