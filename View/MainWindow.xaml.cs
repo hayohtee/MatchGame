@@ -23,6 +23,32 @@ namespace MatchGame
         public MainWindow()
         {
             InitializeComponent();
+
+            SetupGame();
+        }
+
+        void SetupGame()
+        {
+            Random random = new Random();
+
+            List<string> emojiList = new List<string>()
+            {
+                "🚚", "🚚",
+                "😍", "😍",
+                "😡", "😡",
+                "🐵", "🐵",
+                "🦁", "🦁",
+                "🦋", "🦋",
+                "🛒", "🛒",
+                "🎨", "🎨"
+            };
+
+            foreach (TextBlock textBlock in mainGrid.Children.OfType<TextBlock>())
+            {
+                int index = random.Next(emojiList.Count);
+                textBlock.Text = emojiList[index];
+                emojiList.RemoveAt(index);
+            }
         }
     }
 }
